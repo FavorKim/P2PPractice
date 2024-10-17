@@ -49,12 +49,12 @@ public class CentralServer : NetworkBehaviour
             return instance;
         }
     }
+    List<RoomInfo> roomList = new List<RoomInfo>();
 
-    List<RoomInfo> roomList;
-
+    public RoomInfo roomToSend;
 
     [Command(requiresAuthority = false)]
-    public void OnCreateRoom(string ip, Client client)
+    public void OnCreateRoom(string ip)
     {
         var newRoom = new RoomInfo(ip, 7777, true);
         roomList.Add(newRoom);
@@ -68,18 +68,27 @@ public class CentralServer : NetworkBehaviour
 
         foreach(var room in roomList)
         {
-            if(room.Active == true)
+            if (room.Active == true)
+            {
                 roomInfo = room;
+                break;
+            }
         }
         if(roomInfo.Active == true)
         {
-            RpcOnJoinRoom(client, roomInfo);
+            RpcOnJoinRoom(client);
+            //client.OnJoinRoom(roomInfo);
+        }
+        else
+        {
+            return;
         }
     }
+
     [ClientRpc]
-    public void RpcOnJoinRoom(Client client, RoomInfo roomInfo)
+    public void RpcOnJoinRoom(Client client)
     {
-        client.OnJoinRoom(roomInfo);
+        client.OnJoinRoom();
     }
 
     

@@ -11,6 +11,7 @@ public class Client : NetworkBehaviour
     [SerializeField] Text txt;
     [SerializeField] Button createBtn;
     [SerializeField] Button joinBtn;
+    private string ipToJoin;
    
     public override void OnStartServer()
     {
@@ -37,9 +38,10 @@ public class Client : NetworkBehaviour
 
     public void OnCreateRoom()
     {
-        string ip = GetLocalIPAddress();
+        //string ip = GetLocalIPAddress();
+        string ip = "localhost";
         Transport port = Transport.active;
-        CentralServer.Instance.OnCreateRoom(ip, this);
+        CentralServer.Instance.OnCreateRoom(ip);
         NetworkManager.singleton.StopClient();
         NetworkManager.singleton.networkAddress = ip;
         NetworkManager.singleton.transport = port;
@@ -52,15 +54,15 @@ public class Client : NetworkBehaviour
         CentralServer.Instance.CmdOnJoinRoom(this);
     }
 
-    public void OnJoinRoom(RoomInfo info)
+    public void OnJoinRoom()
     {
+        RoomInfo info = CentralServer.Instance.roomToSend;
         
-        string ip;
         if(info.Active == true)
         {
-            ip = info.GetIP();
+            ipToJoin = info.GetIP();
             //NetworkManager.singleton.StopClient();
-            NetworkManager.singleton.networkAddress = ip;
+            NetworkManager.singleton.networkAddress = ipToJoin;
             NetworkManager.singleton.transport = Transport.active;
             NetworkManager.singleton.StartClient();
         }
